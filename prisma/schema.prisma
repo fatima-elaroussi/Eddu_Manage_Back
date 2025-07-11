@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output supprimé = comportement par défaut
+}
+
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  TEACHER
+  ACCOUNTANT
+  RECEPTIONIST
+  USER
+}
+
+model Etudiant {
+  id           Int      @id @default(autoincrement())
+  nom          String
+  prenom       String
+  dateNaissance DateTime
+  adresse      String
+  niveau       String
+  etablissement String
+  matieres     String    // or use separate relation table later
+  telephone    String
+  email        String
+  contactParent String
+  modePaiement String
+  remises      String?   // JSON, or make a proper table later
+  createdAt    DateTime  @default(now())
+}
