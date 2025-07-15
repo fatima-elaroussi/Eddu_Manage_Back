@@ -79,8 +79,15 @@ export const getEtudiant = async (req: Request, res: Response) => {
 export const createEtudiant = async (req: Request, res: Response) => {
   try {
     const validatedData = createEtudiantSchema.parse(req.body);
+    const documentPath = req.file ? req.file.filename : null;
 
-    const newEtudiant = await prisma.etudiant.create({ data: validatedData });
+    const newEtudiant = await prisma.etudiant.create({
+      data: {
+        ...validatedData,
+        documentPath
+      }
+    });
+
     res.status(201).json(newEtudiant);
   } catch (err: any) {
     if (err.name === "ZodError") {
@@ -89,6 +96,7 @@ export const createEtudiant = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error creating student", error: err });
   }
 };
+
 
 // UPDATE student
 export const updateEtudiant = async (req: Request, res: Response) => {

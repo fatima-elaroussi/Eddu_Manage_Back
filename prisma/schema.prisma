@@ -47,5 +47,37 @@ model Etudiant {
   contactParent String
   modePaiement String
   remises      String?   // JSON, or make a proper table later
+  documentPath   String?
+  classes        Classe[]  @relation("EtudiantClasse")
   createdAt    DateTime  @default(now())
+}
+
+model Enseignant {
+  id             Int       @id @default(autoincrement())
+  nom            String
+  prenom         String
+  email          String    @unique
+  telephone      String
+  specialites    String    // comma-separated: "Maths, Français"
+  niveaux        String    // "Collège, Lycée"
+  disponibilites String    // Ex: "Lundi 14h-18h, Mercredi 10h-12h"
+  tarifHoraire   Float
+  modePaiement   String
+  createdAt      DateTime  @default(now())
+
+  // 🔧 Add this to complete the relation
+  classes        Classe[]
+}
+
+
+model Classe {
+  id           Int        @id @default(autoincrement())
+  name         String
+  matiere      String
+  niveau       String
+  horaire      String
+  enseignantId Int
+  enseignant   Enseignant @relation(fields: [enseignantId], references: [id])
+  etudiants    Etudiant[] @relation("EtudiantClasse") // <-- NEW
+  createdAt    DateTime   @default(now())
 }
