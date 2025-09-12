@@ -21,3 +21,4 @@ router.post("/:classId/assign-student", assignStudentToClass);
 router.delete("/:classId/remove-student/:studentId", removeStudentFromClass);
 
 export default router;
+

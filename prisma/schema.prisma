@@ -9,7 +9,6 @@ generator client {
   // output supprimé = comportement par défaut
 }
 
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -34,22 +33,24 @@ enum Role {
 }
 
 model Etudiant {
-  id           Int      @id @default(autoincrement())
-  nom          String
-  prenom       String
+  id            Int        @id @default(autoincrement())
+  nom           String
+  prenom        String
   dateNaissance DateTime
-  adresse      String
-  niveau       String
+  adresse       String
+  niveau        String
   etablissement String
-  matieres     String    // or use separate relation table later
-  telephone    String
-  email        String
+  matieres      String // or use separate relation table later
+  telephone     String
+  email         String
   contactParent String
-  modePaiement String
-  remises      String?   // JSON, or make a proper table later
-  documentPath   String?
-  classes        Classe[]  @relation("EtudiantClasse")
-  createdAt    DateTime  @default(now())
+  modePaiement  String
+  remises       String? // JSON, or make a proper table later
+  documentPath  String?
+  invoices      Invoice[]
+  classes       Classe[]   @relation("EtudiantClasse")
+  paiements     Paiement[]
+  createdAt     DateTime   @default(now())
 }
 
 model Enseignant {
@@ -58,26 +59,74 @@ model Enseignant {
   prenom         String
   email          String    @unique
   telephone      String
-  specialites    String    // comma-separated: "Maths, Français"
-  niveaux        String    // "Collège, Lycée"
-  disponibilites String    // Ex: "Lundi 14h-18h, Mercredi 10h-12h"
+  specialites    String // comma-separated: "Maths, Français"
+  niveaux        String // "Collège, Lycée"
+  disponibilites String // Ex: "Lundi 14h-18h, Mercredi 10h-12h"
   tarifHoraire   Float
   modePaiement   String
-  createdAt      DateTime  @default(now())
+  invoices       Invoice[]
+
+  createdAt DateTime @default(now())
 
   // 🔧 Add this to complete the relation
-  classes        Classe[]
+  classes Classe[]
 }
 
+model Matiere {
+  id       Int       @id @default(autoincrement())
+  name     String
+  classeId Int
+  classe   Classe    @relation(fields: [classeId], references: [id])
+  invoices Invoice[]
+}
 
 model Classe {
   id           Int        @id @default(autoincrement())
   name         String
-  matiere      String
   niveau       String
   horaire      String
+  percentage   Int        @default(50)
   enseignantId Int
+  invoices     Invoice[]
+  matieres     Matiere[]
   enseignant   Enseignant @relation(fields: [enseignantId], references: [id])
   etudiants    Etudiant[] @relation("EtudiantClasse") // <-- NEW
   createdAt    DateTime   @default(now())
+}
+
+model Paiement {
+  id           Int      @id @default(autoincrement())
+  etudiantId   Int
+  etudiant     Etudiant @relation(fields: [etudiantId], references: [id])
+  montant      Float
+  mode         String // ex: "Espèces"
+  statut       String // ex: "complet", "incomplet", "non payé"
+  datePaiement DateTime @default(now())
+}
+
+model Depense {
+  id          Int      @id @default(autoincrement())
+  type        String // "Salaires", "Matériel", etc.
+  montant     Float
+  description String?
+  dateDepense DateTime @default(now())
+}
+
+model Invoice {
+  id         Int      @id @default(autoincrement())
+  etudiant   Etudiant @relation(fields: [etudiantId], references: [id])
+  etudiantId Int
+
+  matiere   Matiere @relation(fields: [matiereId], references: [id])
+  matiereId Int
+
+  enseignant   Enseignant @relation(fields: [enseignantId], references: [id])
+  enseignantId Int
+
+  classe   Classe @relation(fields: [classeId], references: [id])
+  classeId Int
+
+  price         Float // Total paid by student
+  teacherAmount Float // ← Add this: price * percentage
+  createdAt     DateTime @default(now())
 }

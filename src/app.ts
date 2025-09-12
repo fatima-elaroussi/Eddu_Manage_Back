@@ -7,6 +7,9 @@ import etudiantRoutes from "./routes/etudiant.routes";
 import { authenticate } from "./middlewares/auth.middleware";
 import enseignantRoutes from "./routes/enseignant.routes";
 import classeRoutes from "./routes/classe.routes";
+import paiementRoutes from "./routes/paiement.routes";
+import depenseRoutes from "./routes/depense.routes";
+import dashboardRoutes from "./routes/dashboard.routes";
 
 dotenv.config();
 
@@ -21,5 +24,8 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/etudiants", etudiantRoutes);
 app.use("/api/enseignants", enseignantRoutes);
 app.use("/api/classes", classeRoutes);
+app.use("/api/paiements", paiementRoutes);
+app.use("/api/depenses", depenseRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 export default app;

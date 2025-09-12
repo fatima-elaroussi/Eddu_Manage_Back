@@ -54,3 +54,14 @@ export const updateEnseignant = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error updating teacher", error: err });
   }
 };
+
+const getTeacherEarnings = async (req: Request, res: Response) => {
+  const earnings = await prisma.invoice.groupBy({
+    by: ['enseignantId'],
+    _sum: {
+      teacherAmount: true,
+    },
+  });
+
+  res.json(earnings);
+};
